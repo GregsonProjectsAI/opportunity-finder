@@ -458,8 +458,9 @@
                 // Many proxies block or cache Yahoo aggressively. However, to bypass browser CORS if direct fails:
                 // We'll use a more reliable proxy structure for fetching stock data if necessary.
                 // Using 'corsproxy.io' as it routinely works well for Yahoo Finance without caching issues.
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-                debugState.priceUrl = proxyUrl; // Actually we use proxy to fetch the single payload block
+                // We'll bypass the corsproxy wrapper entirely to prevent network failures.
+                const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+                debugState.priceUrl = proxyUrl;
 
                 let response;
                 try {
