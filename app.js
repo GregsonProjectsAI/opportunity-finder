@@ -728,6 +728,78 @@
         }
 
         // --- MA Comparison Backtester --- //
+        function backtestMAStrategy(prices, period) {
+            if (!prices || prices.length < period) {
+                return { totalReturn: 0, trades: 0, winRate: 0 };
+            }
+
+            let capital = 1000;
+            let currentPosition = 0; // 0 = flat, 1 = long, -1 = short
+            let entryPrice = 0;
+            let trades = 0;
+            let winningTrades = 0;
+
+            for (let i = period; i < prices.length; i++) {
+                const todayPrice = prices[i];
+                if (todayPrice === null || isNaN(todayPrice)) continue;
+
+                // Calculate MA for today using prior `period` days
+                const subRange = prices.slice(i - period, i);
+                const validSubRange = subRange.filter(p => p !== null && !isNaN(p));
+                if (validSubRange.length < period) continue;
+                
+                const sum = validSubRange.reduce((a, b) => a + b, 0);
+                const ma = sum / period;
+
+                if (currentPosition === 1 && todayPrice < ma) {
+                    // Close Long, Open Short
+                    const returnPct = (todayPrice - entryPrice) / entryPrice;
+                    capital = capital * (1 + returnPct);
+                    if (returnPct > 0) winningTrades++;
+                    currentPosition = -1;
+                    entryPrice = todayPrice;
+                    trades++;
+                } else if (currentPosition === -1 && todayPrice > ma) {
+                    // Close Short, Open Long
+                    const returnPct = (entryPrice - todayPrice) / entryPrice;
+                    capital = capital * (1 + returnPct);
+                    if (returnPct > 0) winningTrades++;
+                    currentPosition = 1;
+                    entryPrice = todayPrice;
+                    trades++;
+                } else if (currentPosition === 0) {
+                    // Initial trade
+                    currentPosition = todayPrice > ma ? 1 : -1;
+                    entryPrice = todayPrice;
+                }
+            }
+
+            // Close out any open position at the end
+            if (currentPosition !== 0 && entryPrice !== 0 && prices.length > 0) {
+                 const finalPrice = prices[prices.length - 1];
+                 if (finalPrice !== null && !isNaN(finalPrice)) {
+                     let returnPct = 0;
+                     if (currentPosition === 1) {
+                         returnPct = (finalPrice - entryPrice) / entryPrice;
+                     } else {
+                         returnPct = (entryPrice - finalPrice) / entryPrice;
+                     }
+                     capital = capital * (1 + returnPct);
+                     if (returnPct > 0) winningTrades++;
+                     trades++;
+                 }
+            }
+
+            const totalReturn = ((capital - 1000) / 1000) * 100;
+            const winRate = trades > 0 ? (winningTrades / trades) * 100 : 0;
+
+            return {
+                totalReturn,
+                trades,
+                winRate
+            };
+        }
+
         class MovingAverageBacktester {
             constructor() {
                 this.periodsToTest = [50, 75, 100, 125, 150, 200];
