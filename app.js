@@ -822,6 +822,39 @@
             };
         }
 
+        function analyseTrendStrategy(prices) {
+            const { bestPeriod, bestResult } = findBestMAPeriod(prices);
+
+            if (!bestPeriod || !prices || prices.length < bestPeriod) {
+                return null;
+            }
+
+            // Get current price (last valid price in array)
+            const validPrices = prices.filter(p => p !== null && !isNaN(p));
+            if (validPrices.length === 0) return null;
+            const currentPrice = validPrices[validPrices.length - 1];
+
+            // Calculate current MA for the best period
+            const { current: currentMA } = calculateMA(prices, bestPeriod);
+
+            if (currentMA === null) return null;
+
+            // Determine today's signal
+            const signal = currentPrice > currentMA ? "LONG" : (currentPrice < currentMA ? "SHORT" : "FLAT");
+
+            // Calculate distance from MA as percentage
+            const distanceFromMA = ((currentPrice - currentMA) / currentMA) * 100;
+
+            return {
+                bestMA: bestPeriod,
+                backtest: bestResult,
+                signal,
+                currentPrice,
+                currentMA,
+                distanceFromMA
+            };
+        }
+
         class MovingAverageBacktester {
             constructor() {
                 this.periodsToTest = [50, 75, 100, 125, 150, 200];
