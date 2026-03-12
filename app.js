@@ -191,16 +191,7 @@
             const closes = validCandles.map(c => c.close);
             
             // Calculate MA
-            const currentSubset = closes.slice(-period);
-            const sum = currentSubset.reduce((acc, val) => acc + val, 0);
-            const currentMA = sum / period;
-
-            let previousMA = null;
-            const prevSubset = closes.slice(-(period + 1), -1);
-            if (prevSubset.length === period) {
-                const prevSum = prevSubset.reduce((acc, val) => acc + val, 0);
-                previousMA = prevSum / period;
-            }
+            const { current: currentMA, previous: previousMA } = calculateMA(closes, period);
 
             // Calculate ATR(14) - Do not fail MA if this fails
             let atr = null;
@@ -209,6 +200,25 @@
             }
 
             return { current: currentMA, previous: previousMA, atr: atr, insufficientHistory: false };
+        }
+
+        function calculateMA(prices, period) {
+            if (!prices || prices.length < period) {
+                return { current: null, previous: null };
+            }
+
+            const currentSubset = prices.slice(-period);
+            const sum = currentSubset.reduce((acc, val) => acc + val, 0);
+            const currentMA = sum / period;
+
+            let previousMA = null;
+            const prevSubset = prices.slice(-(period + 1), -1);
+            if (prevSubset.length === period) {
+                const prevSum = prevSubset.reduce((acc, val) => acc + val, 0);
+                previousMA = prevSum / period;
+            }
+
+            return { current: currentMA, previous: previousMA };
         }
 
         function calculateATR(candles, period = 14) {
