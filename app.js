@@ -205,29 +205,34 @@
             // Calculate ATR(14) - Do not fail MA if this fails
             let atr = null;
             if (isCandleObjects && validCandles.length >= 15) {
-                let trueRanges = [];
-                // Start from index 1 to have previous close
-                for (let i = 1; i < validCandles.length; i++) {
-                    const high = validCandles[i].high;
-                    const low = validCandles[i].low;
-                    const prevClose = validCandles[i-1].close;
-                    
-                    if (high !== undefined && low !== undefined && prevClose !== undefined) {
-                        const tr1 = high - low;
-                        const tr2 = Math.abs(high - prevClose);
-                        const tr3 = Math.abs(low - prevClose);
-                        trueRanges.push(Math.max(tr1, tr2, tr3));
-                    }
-                }
-                
-                if (trueRanges.length >= 14) {
-                    const atrSubset = trueRanges.slice(-14);
-                    const atrSum = atrSubset.reduce((a, b) => a + b, 0);
-                    atr = atrSum / 14;
-                }
+                atr = calculateATR(validCandles, 14);
             }
 
             return { current: currentMA, previous: previousMA, atr: atr, insufficientHistory: false };
+        }
+
+        function calculateATR(candles, period = 14) {
+            let trueRanges = [];
+            // Start from index 1 to have previous close
+            for (let i = 1; i < candles.length; i++) {
+                const high = candles[i].high;
+                const low = candles[i].low;
+                const prevClose = candles[i-1].close;
+                
+                if (high !== undefined && low !== undefined && prevClose !== undefined) {
+                    const tr1 = high - low;
+                    const tr2 = Math.abs(high - prevClose);
+                    const tr3 = Math.abs(low - prevClose);
+                    trueRanges.push(Math.max(tr1, tr2, tr3));
+                }
+            }
+            
+            if (trueRanges.length >= period) {
+                const atrSubset = trueRanges.slice(-period);
+                const atrSum = atrSubset.reduce((a, b) => a + b, 0);
+                return atrSum / period;
+            }
+            return null;
         }
 
         // --- Data Providers ---
