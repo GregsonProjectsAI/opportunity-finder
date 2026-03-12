@@ -588,17 +588,17 @@
         }
 
         function calculateSlope(currentMA, previousMA) {
-            if (currentMA === null || previousMA === null || previousMA === 0) return { isPositive: null, slopePct: 0 };
-            const slopePct = Math.abs((currentMA - previousMA) / previousMA) * 100;
+            if (currentMA === null || previousMA === null || previousMA === 0) return { direction: "Falling", strength: 0 };
+            const strength = Math.abs((currentMA - previousMA) / previousMA) * 100;
             return {
-                isPositive: currentMA > previousMA,
-                slopePct: slopePct
+                direction: currentMA > previousMA ? "Rising" : "Falling",
+                strength: strength
             };
         }
 
-        function slopeIsPositive(value) {
-          if (value === undefined || value === null) return false;
-          return value > 0;
+        function slopeIsPositive(direction) {
+          if (direction === undefined || direction === null) return false;
+          return direction === "Rising";
         }
 
         function evaluateTrend(price, currentMA, atrValue = null) {
@@ -684,7 +684,7 @@
                     return { hasEnoughData: false, status: "Calculation error", explanation: "Data is mathematically malformed (NaN detected)." };
                 }
 
-                const score = calculateOpportunityScore(alignmentScore, distancePercent, slopeData.slopePct);
+                const score = calculateOpportunityScore(alignmentScore, distancePercent, slopeData.strength);
 
                 let status = "";
                 let statusClass = "";
@@ -712,7 +712,7 @@
 
                 return {
                     hasEnoughData: true,
-                    slopeIsPositive: slopeData.isPositive,
+                    slopeIsPositive: slopeIsPositive(slopeData.direction),
                     distancePercent,
                     atrDistance,
                     score,
