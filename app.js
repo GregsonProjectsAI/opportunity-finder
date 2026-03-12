@@ -822,6 +822,14 @@
             };
         }
 
+        function calculateBuyAndHoldReturn(prices) {
+            const validPrices = prices.filter(p => p !== null && !isNaN(p));
+            if (validPrices.length < 2) return 0;
+            const firstPrice = validPrices[0];
+            const lastPrice = validPrices[validPrices.length - 1];
+            return ((lastPrice - firstPrice) / firstPrice) * 100;
+        }
+
         function analyseTrendStrategy(prices) {
             const { bestPeriod, bestResult } = findBestMAPeriod(prices);
 
@@ -845,13 +853,20 @@
             // Calculate distance from MA as percentage
             const distanceFromMA = ((currentPrice - currentMA) / currentMA) * 100;
 
+            const buyAndHoldReturn = calculateBuyAndHoldReturn(prices);
+            const trendReturn = bestResult.totalReturn;
+            const outperformance = trendReturn - buyAndHoldReturn;
+
             return {
                 bestMA: bestPeriod,
                 backtest: bestResult,
                 signal,
                 currentPrice,
                 currentMA,
-                distanceFromMA
+                distanceFromMA,
+                buyAndHoldReturn,
+                trendReturn,
+                outperformance
             };
         }
 
@@ -1255,6 +1270,10 @@
             const elDirection = document.getElementById('res-direction');
             const elLeverage = document.getElementById('res-leverage');
 
+            const elBuyHold = document.getElementById('res-buyhold');
+            const elTrendReturn = document.getElementById('res-trend-return');
+            const elOutperformance = document.getElementById('res-outperformance');
+
             elDistLabel.textContent = `Distance from MA(${data.maPeriod})`;
 
             if (data.hasEnoughData) {
@@ -1335,6 +1354,39 @@
                 if (elLeverage) {
                     elLeverage.textContent = data.leverage;
                     elLeverage.className = "result-value";
+                }
+
+                if (elBuyHold) {
+                    if (data.buyAndHoldReturn !== null && !isNaN(data.buyAndHoldReturn)) {
+                        const sign = data.buyAndHoldReturn > 0 ? "+" : "";
+                        elBuyHold.textContent = `${sign}${data.buyAndHoldReturn.toFixed(2)}%`;
+                        elBuyHold.className = `result-value ${data.buyAndHoldReturn >= 0 ? 'change-positive' : 'change-negative'}`;
+                    } else {
+                        elBuyHold.textContent = "N/A";
+                        elBuyHold.className = "result-value data-missing";
+                    }
+                }
+
+                if (elTrendReturn) {
+                    if (data.trendReturn !== null && !isNaN(data.trendReturn)) {
+                        const sign = data.trendReturn > 0 ? "+" : "";
+                        elTrendReturn.textContent = `${sign}${data.trendReturn.toFixed(2)}%`;
+                        elTrendReturn.className = `result-value ${data.trendReturn >= 0 ? 'change-positive' : 'change-negative'}`;
+                    } else {
+                        elTrendReturn.textContent = "N/A";
+                        elTrendReturn.className = "result-value data-missing";
+                    }
+                }
+
+                if (elOutperformance) {
+                    if (data.outperformance !== null && !isNaN(data.outperformance)) {
+                        const sign = data.outperformance > 0 ? "+" : "";
+                        elOutperformance.textContent = `${sign}${data.outperformance.toFixed(2)}%`;
+                        elOutperformance.className = `result-value ${data.outperformance >= 0 ? 'change-positive' : 'change-negative'}`;
+                    } else {
+                        elOutperformance.textContent = "N/A";
+                        elOutperformance.className = "result-value data-missing";
+                    }
                 }
 
                 if (elScore) elScore.textContent = data.score !== null ? data.score : "-";
@@ -1574,6 +1626,7 @@
                                     const btcAttempt = debugTracker.fallbackAttempts.find(a => a.success);
                                     if (btcAttempt && btcAttempt.rawClosingPrices) {
                                         const btcAnalysis = analyseTrendStrategy(btcAttempt.rawClosingPrices);
+                                        console.log("BTC trend strategy analysis:", btcAnalysis);
                                         if (btcAnalysis) {
                                             const bestMAEl = document.getElementById('btc-best-ma');
                                             const returnEl = document.getElementById('btc-backtest-return');
@@ -1581,6 +1634,10 @@
                                             const priceEl = document.getElementById('btc-current-price');
                                             const maEl = document.getElementById('btc-current-ma');
                                             const distEl = document.getElementById('btc-distance');
+
+                                            const buyHoldEl = document.getElementById('btc-buyhold');
+                                            const trendReturnEl = document.getElementById('btc-trend-return');
+                                            const outperformEl = document.getElementById('btc-outperformance');
 
                                             if (bestMAEl && returnEl && signalEl && priceEl && maEl && distEl) {
                                                 bestMAEl.textContent = `MA(${btcAnalysis.bestMA})`;
@@ -1593,6 +1650,23 @@
                                                 const sign = btcAnalysis.distanceFromMA > 0 ? "+" : "";
                                                 distEl.textContent = `${sign}${btcAnalysis.distanceFromMA.toFixed(2)}%`;
                                                 distEl.className = btcAnalysis.distanceFromMA > 0 ? "result-value change-positive" : (btcAnalysis.distanceFromMA < 0 ? "result-value change-negative" : "result-value data-missing");
+                                            if (buyHoldEl) {
+                                                buyHoldEl.textContent = `${btcAnalysis.buyAndHoldReturn.toFixed(2)}%`;
+                                            }
+
+                                            if (trendReturnEl) {
+                                                trendReturnEl.textContent = `${btcAnalysis.trendReturn.toFixed(2)}%`;
+                                            }
+
+                                            if (outperformEl) {
+                                               const sign2 = btcAnalysis.outperformance > 0 ? "+" : "";
+                                               outperformEl.textContent = `${sign2}${btcAnalysis.outperformance.toFixed(2)}%`;
+
+                                               if (btcAnalysis.outperformance > 0)
+                                                   outperformEl.className = "result-value change-positive";
+                                               else if (btcAnalysis.outperformance < 0)
+                                                   outperformEl.className = "result-value change-negative";
+                                            }
                                             }
                                         }
                                     }

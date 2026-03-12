@@ -1,0 +1,16 @@
+Project state confirmed clean after Antigravity quota stop.
+
+Last attempted AG task (temporary main trend strategy console log) was NOT applied.
+Verified by searching app.js for:
+"Main trend strategy analysis:"
+and finding no match.
+
+Current stable state:
+- working Opportunity analysis UI
+- working BTC strategy panel
+- scanner width fixed
+- analyseTrendStrategy() now returns:
+  bestMA, backtest, signal, currentPrice, currentMA, distanceFromMA, buyAndHoldReturn, trendReturn, outperformance
+
+Next milestone:
+- add Buy & Hold vs Trend Strategy comparison to analyser UI
