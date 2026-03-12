@@ -800,6 +800,28 @@
             };
         }
 
+        function findBestMAPeriod(prices, minPeriod = 20, maxPeriod = 250) {
+            let bestPeriod = null;
+            let bestResult = null;
+            let allResults = [];
+
+            for (let p = minPeriod; p <= maxPeriod; p++) {
+                const result = backtestMAStrategy(prices, p);
+                allResults.push({ period: p, result: result });
+
+                if (bestResult === null || result.totalReturn > bestResult.totalReturn) {
+                    bestResult = result;
+                    bestPeriod = p;
+                }
+            }
+
+            return {
+                bestPeriod,
+                bestResult,
+                allResults
+            };
+        }
+
         class MovingAverageBacktester {
             constructor() {
                 this.periodsToTest = [50, 75, 100, 125, 150, 200];
