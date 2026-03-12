@@ -1065,6 +1065,8 @@
                 }
                 
             } catch (error) {
+                console.error("Analyze Opportunity failed:", error);
+
                 // If it's one of the explicitly requested error messages, show it verbatim
                 const explicitErrors = [
                     "Mapped crypto asset unavailable", 
@@ -1128,45 +1130,92 @@
         }
 
         function renderBlankResults(symbol) {
-            document.getElementById('res-symbol').textContent = symbol.toUpperCase();
-            document.getElementById('res-price').textContent = "---";
+            const elSymbol = document.getElementById('res-symbol');
+            if (elSymbol) elSymbol.textContent = symbol.toUpperCase();
             
-            document.getElementById('res-change-label').textContent = "Change";
+            const elPrice = document.getElementById('res-price');
+            if (elPrice) elPrice.textContent = "---";
+            
+            const elChangeLabel = document.getElementById('res-change-label');
+            if (elChangeLabel) elChangeLabel.textContent = "Change";
+            
             const elChange = document.getElementById('res-change');
-            elChange.textContent = "Data unavailable";
-            elChange.className = "result-value data-missing";
+            if (elChange) {
+                elChange.textContent = "Data unavailable";
+                elChange.className = "result-value data-missing";
+            }
 
-            document.getElementById('res-ma-label').textContent = `MA`;
-            document.getElementById('res-ma-value').textContent = "N/A";
-            document.getElementById('res-ma-value').className = "result-value data-missing";
+            const elMaLabel = document.getElementById('res-ma-label');
+            if (elMaLabel) elMaLabel.textContent = `MA`;
             
-            document.getElementById('res-ma-slope').textContent = "N/A";
-            document.getElementById('res-ma-slope').className = "result-value data-missing";
+            const elMaValue = document.getElementById('res-ma-value');
+            if (elMaValue) {
+                elMaValue.textContent = "N/A";
+                elMaValue.className = "result-value data-missing";
+            }
             
-            document.getElementById('res-dist-label').textContent = "Distance from MA";
-            document.getElementById('res-dist-value').textContent = "N/A";
-            document.getElementById('res-dist-value').className = "result-value data-missing";
-            document.getElementById('res-trend-signal').textContent = "";
+            const elMaSlope = document.getElementById('res-ma-slope');
+            if (elMaSlope) {
+                elMaSlope.textContent = "N/A";
+                elMaSlope.className = "result-value data-missing";
+            }
+            
+            const elDistLabel = document.getElementById('res-dist-label');
+            if (elDistLabel) elDistLabel.textContent = "Distance from MA";
+            
+            const elDistValue = document.getElementById('res-dist-value');
+            if (elDistValue) {
+                elDistValue.textContent = "N/A";
+                elDistValue.className = "result-value data-missing";
+            }
+            
+            const elTrendSignal = document.getElementById('res-trend-signal');
+            if (elTrendSignal) elTrendSignal.textContent = "";
 
-            document.getElementById('res-atr-value').textContent = "N/A";
-            document.getElementById('res-atr-value').className = "result-value data-missing";
-            document.getElementById('res-atr-dist').textContent = "N/A";
-            document.getElementById('res-atr-dist').className = "result-value data-missing";
-
-            document.getElementById('res-regime').textContent = "N/A";
-            document.getElementById('res-regime').className = "result-value data-missing";
-            document.getElementById('res-direction').textContent = "N/A";
-            document.getElementById('res-direction').className = "result-value data-missing";
-            document.getElementById('res-leverage').textContent = "N/A";
-            document.getElementById('res-leverage').className = "result-value data-missing";
-
-            document.getElementById('res-score').textContent = "-";
+            const elAtrValue = document.getElementById('res-atr-value');
+            if (elAtrValue) {
+                elAtrValue.textContent = "N/A";
+                elAtrValue.className = "result-value data-missing";
+            }
             
-            document.getElementById('res-status-badge').textContent = "Analysis Failed";
-            document.getElementById('res-status-badge').className = "opportunity-badge badge-neutral";
-            document.getElementById('res-explanation').textContent = "Data could not be fetched for this asset. Check the root issue inside the debug panel.";
+            const elAtrDist = document.getElementById('res-atr-dist');
+            if (elAtrDist) {
+                elAtrDist.textContent = "N/A";
+                elAtrDist.className = "result-value data-missing";
+            }
+
+            const elRegime = document.getElementById('res-regime');
+            if (elRegime) {
+                elRegime.textContent = "N/A";
+                elRegime.className = "result-value data-missing";
+            }
             
-            document.getElementById('res-time').textContent = "";
+            const elDirection = document.getElementById('res-direction');
+            if (elDirection) {
+                elDirection.textContent = "N/A";
+                elDirection.className = "result-value data-missing";
+            }
+            
+            const elLeverage = document.getElementById('res-leverage');
+            if (elLeverage) {
+                elLeverage.textContent = "N/A";
+                elLeverage.className = "result-value data-missing";
+            }
+
+            const elScore = document.getElementById('res-score');
+            if (elScore) elScore.textContent = "-";
+            
+            const elBadge = document.getElementById('res-status-badge');
+            if (elBadge) {
+                elBadge.textContent = "Analysis Failed";
+                elBadge.className = "opportunity-badge badge-neutral";
+            }
+            
+            const elExplanation = document.getElementById('res-explanation');
+            if (elExplanation) elExplanation.textContent = "Data could not be fetched for this asset. Check the root issue inside the debug panel.";
+            
+            const elTime = document.getElementById('res-time');
+            if (elTime) elTime.textContent = "";
         }
 
         function renderResults(data) {
@@ -1221,71 +1270,110 @@
                 }
 
                 if (data.distancePercent !== null && !isNaN(data.distancePercent)) {
-                    const distSign = data.distancePercent > 0 ? "+" : "";
-                    elDistValue.textContent = `${distSign}${data.distancePercent.toFixed(2)}%`;
-                    
-                    if (data.distancePercent > 0) elDistValue.className = "result-value change-positive";
-                    else if (data.distancePercent < 0) elDistValue.className = "result-value change-negative";
-                    else elDistValue.className = "result-value change-neutral";
+                    if (elDistValue) {
+                        const distSign = data.distancePercent > 0 ? "+" : "";
+                        elDistValue.textContent = `${distSign}${data.distancePercent.toFixed(2)}%`;
+                        
+                        if (data.distancePercent > 0) elDistValue.className = "result-value change-positive";
+                        else if (data.distancePercent < 0) elDistValue.className = "result-value change-negative";
+                        else elDistValue.className = "result-value change-neutral";
+                    }
                 } else {
-                    elDistValue.textContent = "N/A";
-                    elDistValue.className = "result-value data-missing";
+                    if (elDistValue) {
+                        elDistValue.textContent = "N/A";
+                        elDistValue.className = "result-value data-missing";
+                    }
                 }
 
                 if (data.atrValue !== null && !isNaN(data.atrValue)) {
-                    elAtrValue.textContent = formatCurrency(data.atrValue);
-                    elAtrValue.className = "result-value";
+                    if (elAtrValue) {
+                        elAtrValue.textContent = formatCurrency(data.atrValue);
+                        elAtrValue.className = "result-value";
+                    }
                 } else {
-                    elAtrValue.textContent = "N/A";
-                    elAtrValue.className = "result-value data-missing";
+                    if (elAtrValue) {
+                        elAtrValue.textContent = "N/A";
+                        elAtrValue.className = "result-value data-missing";
+                    }
                 }
 
                 if (data.atrDistance !== null && !isNaN(data.atrDistance)) {
-                    const distSign = data.atrDistance > 0 ? "+" : "";
-                    elAtrDist.textContent = `${distSign}${data.atrDistance.toFixed(2)}x ATR`;
-                    if (data.atrDistance > 0) elAtrDist.className = "result-value change-positive";
-                    else if (data.atrDistance < 0) elAtrDist.className = "result-value change-negative";
-                    else elAtrDist.className = "result-value change-neutral";
+                    if (elAtrDist) {
+                        const distSign = data.atrDistance > 0 ? "+" : "";
+                        elAtrDist.textContent = `${distSign}${data.atrDistance.toFixed(2)}x ATR`;
+                        if (data.atrDistance > 0) elAtrDist.className = "result-value change-positive";
+                        else if (data.atrDistance < 0) elAtrDist.className = "result-value change-negative";
+                        else elAtrDist.className = "result-value change-neutral";
+                    }
                 } else {
+                    if (elAtrDist) {
+                        elAtrDist.textContent = "N/A";
+                        elAtrDist.className = "result-value data-missing";
+                    }
+                }
+
+                if (elTrendSignal) {
+                    if (data.price >= data.maValue) {
+                        elTrendSignal.textContent = "Price is above trend average (Bullish Context)";
+                        elTrendSignal.className = "trend-signal change-positive";
+                    } else {
+                        elTrendSignal.textContent = "Price is below trend average (Bearish Context)";
+                        elTrendSignal.className = "trend-signal change-negative";
+                    }
+                }
+
+                if (elRegime) {
+                    elRegime.textContent = data.regime;
+                    elRegime.className = `result-value ${data.regime === 'Bullish' ? 'change-positive' : 'change-negative'}`;
+                }
+                
+                if (elDirection) {
+                    elDirection.textContent = data.direction;
+                    elDirection.className = `result-value ${data.direction === 'Long' ? 'change-positive' : 'change-negative'}`;
+                }
+                
+                if (elLeverage) {
+                    elLeverage.textContent = data.leverage;
+                    elLeverage.className = "result-value";
+                }
+
+                if (elScore) elScore.textContent = data.score !== null ? data.score : "-";
+                
+                if (elBadge) {
+                    elBadge.textContent = data.status;
+                    elBadge.className = `opportunity-badge ${data.statusClass}`;
+                }
+                
+                if (elExplanation) elExplanation.textContent = data.explanation;
+
+            } else {
+                const elMaValue = document.getElementById('res-ma-value');
+                if (elMaValue) {
+                    elMaValue.textContent = "N/A";
+                    elMaValue.className = "result-value data-missing";
+                }
+                
+                if (elMaSlope) {
+                    elMaSlope.textContent = "N/A";
+                    elMaSlope.className = "result-value data-missing";
+                }
+                
+                if (elDistValue) {
+                    elDistValue.textContent = "N/A";
+                    elDistValue.className = "result-value data-missing";
+                }
+                
+                if (elAtrValue) {
+                    elAtrValue.textContent = "N/A";
+                    elAtrValue.className = "result-value data-missing";
+                }
+                
+                if (elAtrDist) {
                     elAtrDist.textContent = "N/A";
                     elAtrDist.className = "result-value data-missing";
                 }
-
-                if (data.price >= data.maValue) {
-                    elTrendSignal.textContent = "Price is above trend average (Bullish Context)";
-                    elTrendSignal.className = "trend-signal change-positive";
-                } else {
-                    elTrendSignal.textContent = "Price is below trend average (Bearish Context)";
-                    elTrendSignal.className = "trend-signal change-negative";
-                }
-
-                elRegime.textContent = data.regime;
-                elRegime.className = `result-value ${data.regime === 'Bullish' ? 'change-positive' : 'change-negative'}`;
                 
-                elDirection.textContent = data.direction;
-                elDirection.className = `result-value ${data.direction === 'Long' ? 'change-positive' : 'change-negative'}`;
-                
-                elLeverage.textContent = data.leverage;
-                elLeverage.className = "result-value";
-
-                elScore.textContent = data.score !== null ? data.score : "-";
-                
-                elBadge.textContent = data.status;
-                elBadge.className = `opportunity-badge ${data.statusClass}`;
-                elExplanation.textContent = data.explanation;
-
-            } else {
-                document.getElementById('res-ma-value').textContent = "N/A";
-                document.getElementById('res-ma-value').className = "result-value data-missing";
-                elMaSlope.textContent = "N/A";
-                elMaSlope.className = "result-value data-missing";
-                elDistValue.textContent = "N/A";
-                elDistValue.className = "result-value data-missing";
-                elAtrValue.textContent = "N/A";
-                elAtrValue.className = "result-value data-missing";
-                elAtrDist.textContent = "N/A";
-                elAtrDist.className = "result-value data-missing";
-                elTrendSignal.textContent = "";
+                if (elTrendSignal) elTrendSignal.textContent = "";
                 
                 elRegime.textContent = "N/A";
                 elRegime.className = "result-value data-missing";
@@ -1480,6 +1568,35 @@
                                 rowData.direction = data.direction;
                                 rowData.leverage = data.leverage;
                                 rowData.score = data.score !== null ? data.score : -999; 
+
+                                // Populate BTC Trend Strategy Panel if symbol is BTC
+                                if (symbol.toUpperCase() === 'BTC' && window.debugTracker && debugTracker.fallbackAttempts) {
+                                    const btcAttempt = debugTracker.fallbackAttempts.find(a => a.success);
+                                    if (btcAttempt && btcAttempt.rawClosingPrices) {
+                                        const btcAnalysis = analyseTrendStrategy(btcAttempt.rawClosingPrices);
+                                        if (btcAnalysis) {
+                                            const bestMAEl = document.getElementById('btc-best-ma');
+                                            const returnEl = document.getElementById('btc-backtest-return');
+                                            const signalEl = document.getElementById('btc-signal');
+                                            const priceEl = document.getElementById('btc-current-price');
+                                            const maEl = document.getElementById('btc-current-ma');
+                                            const distEl = document.getElementById('btc-distance');
+
+                                            if (bestMAEl && returnEl && signalEl && priceEl && maEl && distEl) {
+                                                bestMAEl.textContent = `MA(${btcAnalysis.bestMA})`;
+                                                returnEl.textContent = `${btcAnalysis.backtest.totalReturn.toFixed(2)}%`;
+                                                returnEl.className = btcAnalysis.backtest.totalReturn > 0 ? "result-value change-positive" : "result-value change-negative";
+                                                signalEl.textContent = btcAnalysis.signal;
+                                                signalEl.className = btcAnalysis.signal === "LONG" ? "result-value change-positive" : (btcAnalysis.signal === "SHORT" ? "result-value change-negative" : "result-value data-missing");
+                                                priceEl.textContent = formatCurrency(btcAnalysis.currentPrice);
+                                                maEl.textContent = formatCurrency(btcAnalysis.currentMA);
+                                                const sign = btcAnalysis.distanceFromMA > 0 ? "+" : "";
+                                                distEl.textContent = `${sign}${btcAnalysis.distanceFromMA.toFixed(2)}%`;
+                                                distEl.className = btcAnalysis.distanceFromMA > 0 ? "result-value change-positive" : (btcAnalysis.distanceFromMA < 0 ? "result-value change-negative" : "result-value data-missing");
+                                            }
+                                        }
+                                    }
+                                }
                             } else {
                                 rowData.status = "Data incomplete";
                             }

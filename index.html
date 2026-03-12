@@ -584,8 +584,45 @@
                 <div class="metric-value" id="res-best-ma" style="color: #60a5fa;">---</div>
             </div>
         </div>
-    </div>
     </div> <!-- Explicitly close main .container here so Scanner breaks out -->
+
+    <!-- BTC Trend Strategy Panel -->
+    <div class="scanner-container" style="margin-top: 2rem; margin-bottom: 2rem; padding: 1.5rem 2.5rem;">
+        <h2 style="margin-bottom: 1rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                <path d="M12 18V6"></path>
+            </svg>
+            BTC Trend Strategy
+        </h2>
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+            <div>
+                <div class="result-label">Best MA</div>
+                <div class="result-value" id="btc-best-ma" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+            <div>
+                <div class="result-label">Backtest Return</div>
+                <div class="result-value" id="btc-backtest-return" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+            <div>
+                <div class="result-label">Signal</div>
+                <div class="result-value" id="btc-signal" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+            <div>
+                <div class="result-label">Current Price</div>
+                <div class="result-value" id="btc-current-price" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+            <div>
+                <div class="result-label">Current MA</div>
+                <div class="result-value" id="btc-current-ma" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+            <div>
+                <div class="result-label">Distance from MA</div>
+                <div class="result-value" id="btc-distance" style="text-align: left; max-width: 100%;">---</div>
+            </div>
+        </div>
+    </div>
 
     <!-- Watchlist Scanner -->
     <div class="scanner-container">
